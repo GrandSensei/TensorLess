@@ -9,8 +9,12 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
+import os
+
 import dj_database_url
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -76,10 +80,19 @@ WSGI_APPLICATION = 'NumberRecognitionApp.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 # 1. Default to SQLite (so it still works if you lose internet)
+
+
+load_dotenv()
+
 DATABASES = {
-    'default': dj_database_url.parse(
-        "postgresql://neondb_owner:npg_RgUIx2jHTP9f@ep-summer-fire-ab756z5v-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),      # <--- Reads from .env
+        'USER': os.getenv('DB_USER'),      # <--- Reads from .env
+        'PASSWORD': os.getenv('DB_PASSWORD'), # <--- Reads from .env
+        'HOST': os.getenv('DB_HOST'),      # <--- Reads from .env
+        'PORT': '5432',
+    }
 }
 
 # Password validation
