@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hybrid Neural Interface</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #f4f4f4; }
+        .container { background: white; padding: 20px; border-radius: 8px; display: inline-block; margin-top: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        canvas { border: 2px solid #333; cursor: crosshair; background: black; } /* MNIST is white on black */
+        button { padding: 10px 20px; font-size: 16px; margin: 10px; cursor: pointer; }
+        #result { font-size: 40px; font-weight: bold; color: #007bff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Legacy Java Engine Bridge</h1>
+        <p>Draw a digit (0-9)</p>
+        <canvas id="canvas" width="280" height="280"></canvas>
+        <br>
+        <button onclick="clearCanvas()">Clear</button>
+        <button onclick="predict()">Predict (Run Java)</button>
+        <div id="result">?</div>
+        <div id="feedback-section" style="display:none; margin-top: 15px; background: #fff3e0; padding: 10px; border-radius: 8px;">
+
+            <div id="feedback-question">
+                <p style="margin: 0 0 10px 0;">Is this correct?</p>
+                <button onclick="sendFeedback(true)" style="background: #4caf50; color: white;">Yes ✅</button>
+                <button onclick="showCorrectionUI()" style="background: #f44336; color: white;">No ❌</button>
+            </div>
+
+            <div id="correction-buttons" style="display:none; margin-top: 10px;">
+                <p>What is the correct digit?</p>
+                <script>
+                    for(let i=0; i<=9; i++) {
+                        document.write(`<button onclick="sendFeedback(false, ${i})" style="padding:5px 10px; margin:2px;">${i}</button>`);
+                    }
+                </script>
+            </div>
+
+            <div id="feedback-success" style="display:none;">
+                <p style="color: green; font-weight: bold; margin: 0;">Saved to Dataset! ✅</p>
+            </div>
+
+        </div>
+        <div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px;">
+            <div style="background-color: #e8f5e9; padding: 10px; border-radius: 5px; display: inline-block;">
+                <span style="font-size: 1.2em;">🌍 Community Predictions: </span>
+                <strong id="global-count" style="font-size: 1.5em; color: #2e7d32;">-</strong>
+            </div>
+
+            <div id="history-list" style="margin-top: 20px; text-align: left; max-width: 300px; margin-left: auto; margin-right: auto;">
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let painting = false;
+        let currentLogId = null;
+
+        // Setup drawing (White on Black to match MNIST)
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 20; // Thick lines for better detection
+        ctx.lineCap = "round";
+
+        function startPosition(e) { painting = true; draw(e); }
+        function endPosition() { painting = false; ctx.beginPath(); }
+        function draw(e) {
+            if (!painting) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        canvas.addEventListener('mousedown', startPosition);
+        canvas.addEventListener('mouseup', endPosition);
+        canvas.addEventListener('mousemove', draw);
+
+        function clearCanvas() {
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('result').innerText = "?";
+        }
+
+        async function predict() {
+            // --- UPDATED LOGIC START ---
+
+            // 1. Get the "Smart" Centered Pixels
+            let pixels = getCenteredPixels(canvas);
+
+            // Safety check: If user clicked predict on an empty canvas
+            if (!pixels) {
+                alert("Please draw a digit first!");
+                return;
+            }
+
+            // --- UPDATED LOGIC END ---
+
+            // 2. Send to Django (This part stays the same)
+            const response = await fetch('/predict/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pixels: pixels })
+            });
+
+            const result = await response.json();
+
+            // 3. UI Updates (Same as before)
+            document.getElementById('result').innerText = result.digit;
+
+            if (result.global_count) {
+                document.getElementById('global-count').innerText = result.global_count;
+            }
+
+            currentLogId = result.log_id;
+            // 3. Reset and Show Feedback UI
+            // 1. Show the main section
+            document.getElementById('feedback-section').style.display = 'block';
+
+            // 2. Show the "Question" buttons
+            document.getElementById('feedback-question').style.display = 'block';
+
+            // 3. Hide the "Correction" and "Success" parts from previous turns
+            document.getElementById('correction-buttons').style.display = 'none';
+            document.getElementById('feedback-success').style.display = 'none';
+            saveToHistory(null, result.digit);
+        }
+       // --- HISTORY LOGIC START ---
+const HISTORY_KEY = 'digit_app_history';
+
+// 1. Initial Save (Called inside predict())
+function saveToHistory(pixelData, predictedDigit) {
+    let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+
+    history.unshift({
+        timestamp: new Date().toLocaleTimeString(),
+        digit: predictedDigit,
+        status: 'pending', // New field: pending, correct, or wrong
+        actual: null       // New field: stores the real number if wrong
+    });
+
+    if (history.length > 5) history.pop();
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    renderHistory();
+}
+
+// 2. Update History (Called inside sendFeedback())
+function updateHistoryWithFeedback(isCorrect, correctDigit) {
+    let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+
+    // We assume the most recent entry (index 0) is the current one
+    if (history.length > 0) {
+        history[0].status = isCorrect ? 'correct' : 'wrong';
+        history[0].actual = isCorrect ? history[0].digit : correctDigit;
+
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        renderHistory();
+    }
+}
+
+// 3. Render the List (Called on load and updates)
+function renderHistory() {
+    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    const container = document.getElementById('history-list');
+
+    container.innerHTML = '<h3>My Recent Attempts</h3>';
+
+    history.forEach(item => {
+        let statusIcon = '⏳'; // Default pending
+        let details = `Pred: <b>${item.digit}</b>`;
+
+        if (item.status === 'correct') {
+            statusIcon = '✅';
+        } else if (item.status === 'wrong') {
+            statusIcon = '❌';
+            details += ` (Actual: <b>${item.actual}</b>)`; // Show the correction
+        }
+
+        // Add a nice styled box for each item
+        container.innerHTML += `
+            <div style="border-bottom: 1px solid #eee; padding: 5px 0; font-size: 0.9em;">
+                <span style="float: right;">${item.timestamp}</span>
+                <span>${statusIcon} ${details}</span>
+            </div>
+        `;
+    });
+}
+// --- HISTORY LOGIC END ---
+
+        // 4. CALL THIS ON LOAD
+        document.addEventListener('DOMContentLoaded', renderHistory);
+
+        // --- NEW HELPER FUNCTION: AUTO-CENTERING ---
+        function getCenteredPixels(sourceCanvas) {
+            const ctx = sourceCanvas.getContext('2d');
+            const width = sourceCanvas.width;
+            const height = sourceCanvas.height;
+            const imgData = ctx.getImageData(0, 0, width, height);
+            const data = imgData.data;
+
+            // 1. Find Bounding Box (where the drawing actually is)
+            let minX = width, minY = height, maxX = 0, maxY = 0;
+            let found = false;
+
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    // Check alpha (transparency) or brightness
+                    // Since we draw white on black, we check Red channel > 0
+                    const index = (y * width + x) * 4;
+                    if (data[index] > 0) { // If pixel is not black
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+                        found = true;
+                    }
+                }
+            }
+
+            // If canvas is empty, just return standard empty pixels
+            if (!found) return null;
+
+            // 2. Crop the digit
+            const cropWidth = maxX - minX + 1;
+            const cropHeight = maxY - minY + 1;
+
+            // 3. Scale into a 20x20 box (MNIST standard inner box)
+            // We preserve aspect ratio!
+            const size = 20;
+            const scale = size / Math.max(cropWidth, cropHeight);
+
+            const scaledWidth = cropWidth * scale;
+            const scaledHeight = cropHeight * scale;
+
+            // 4. Create a Temporary Canvas to do the resizing
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = 28;  // Final MNIST size
+            tempCanvas.height = 28;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            // Fill with Black first
+            tempCtx.fillStyle = "black";
+            tempCtx.fillRect(0, 0, 28, 28);
+
+            // 5. Draw the cropped image into the CENTER of the 28x28 box
+            // Center X = (28 - width) / 2
+            const offsetX = (28 - scaledWidth) / 2;
+            const offsetY = (28 - scaledHeight) / 2;
+
+            // Draw using high quality smoothing
+            tempCtx.imageSmoothingEnabled = true;
+            tempCtx.drawImage(
+                sourceCanvas,
+                minX, minY, cropWidth, cropHeight, // Source crop
+                offsetX, offsetY, scaledWidth, scaledHeight // Destination location
+            );
+
+            // 6. Extract the final 28x28 pixels
+            const finalData = tempCtx.getImageData(0, 0, 28, 28);
+            const pixels = [];
+            for (let i = 0; i < finalData.data.length; i += 4) {
+                // Normalize 0-255 -> 0.0-1.0
+                pixels.push(finalData.data[i] / 255.0);
+            }
+
+            return pixels;
+        }
+
+        function showCorrectionUI() {
+        document.getElementById('feedback-question').style.display = 'none';
+        document.getElementById('correction-buttons').style.display = 'block';
+        }
+
+
+        async function sendFeedback(isCorrect, correctDigit = null) {
+            if (!currentLogId) return;
+            updateHistoryWithFeedback(isCorrect, correctDigit);
+            await fetch('/feedback/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    log_id: currentLogId,
+                    is_correct: isCorrect,
+                    correct_digit: correctDigit
+                })
+            });
+
+            // Hide the buttons (both Yes/No and 0-9)
+            document.getElementById('feedback-question').style.display = 'none';
+            document.getElementById('correction-buttons').style.display = 'none';
+
+            // Show the Success Message
+            document.getElementById('feedback-success').style.display = 'block';
+
+            // Optional: Hide the whole box after 2 seconds
+            setTimeout(() => {
+                document.getElementById('feedback-section').style.display = 'none';
+            }, 2000);
+        }
+    </script>
+</body>
+
+</html>
