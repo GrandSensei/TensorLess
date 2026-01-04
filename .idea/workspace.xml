@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="650e3c2f-daa7-42ce-9df7-30ba6ca3fab8" name="Changes" comment="Had to add an if statement to use sqlite during build">
-      <change beforePath="$PROJECT_DIR$/NumberRecognitionApp/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/NumberRecognitionApp/settings.py" afterDir="false" />
-    </list>
+    <list default="true" id="650e3c2f-daa7-42ce-9df7-30ba6ca3fab8" name="Changes" comment="Committing my soul to the devil" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -303,7 +301,7 @@
       <workItem from="1767452878624" duration="78000" />
       <workItem from="1767452968123" duration="252000" />
       <workItem from="1767453362798" duration="17237000" />
-      <workItem from="1767529279153" duration="12414000" />
+      <workItem from="1767529279153" duration="12887000" />
     </task>
     <task id="LOCAL-00001" summary="this is the first commit">
       <option name="closed" value="true" />
@@ -377,7 +375,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767542627471</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Committing my soul to the devil">
+      <option name="closed" value="true" />
+      <created>1767543016055</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1767543016055</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -402,7 +408,8 @@
     <MESSAGE value="Add missing requirements file" />
     <MESSAGE value="Edited the Dockerfile to upgrade version of python" />
     <MESSAGE value="Had to add an if statement to use sqlite during build" />
-    <option name="LAST_COMMIT_MESSAGE" value="Had to add an if statement to use sqlite during build" />
+    <MESSAGE value="Committing my soul to the devil" />
+    <option name="LAST_COMMIT_MESSAGE" value="Committing my soul to the devil" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/NumberRecognitionApp$manage.coverage" NAME="manage Coverage Results" MODIFIED="1767529789370" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

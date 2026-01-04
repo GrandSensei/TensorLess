@@ -18,6 +18,9 @@ java -cp java_core/bin PredictorServer &
 echo "Waiting for Java to initialize..."
 sleep 3
 
+echo "Applying Database Migrations..."
+python manage.py migrate
+
 # 4. Start Django (Gunicorn) in FOREGROUND
 # Render provides the $PORT variable automatically
 echo "Starting Django Web Server..."
