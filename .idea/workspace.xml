@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="650e3c2f-daa7-42ce-9df7-30ba6ca3fab8" name="Changes" comment="Committing my soul to the devil_2">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_core/bin/model.bin" beforeDir="false" />
+    <list default="true" id="650e3c2f-daa7-42ce-9df7-30ba6ca3fab8" name="Changes" comment="Committing my soul to the devil_3">
       <change beforePath="$PROJECT_DIR$/java_core/src/PredictorServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_core/src/PredictorServer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -165,7 +163,7 @@
       <workItem from="1767452968123" duration="252000" />
       <workItem from="1767453362798" duration="17237000" />
       <workItem from="1767529279153" duration="14311000" />
-      <workItem from="1767544913091" duration="456000" />
+      <workItem from="1767544913091" duration="979000" />
     </task>
     <task id="LOCAL-00001" summary="this is the first commit">
       <option name="closed" value="true" />
@@ -255,7 +253,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767543651043</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Committing my soul to the devil_3">
+      <option name="closed" value="true" />
+      <created>1767545376908</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1767545376908</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -282,7 +288,8 @@
     <MESSAGE value="Had to add an if statement to use sqlite during build" />
     <MESSAGE value="Committing my soul to the devil" />
     <MESSAGE value="Committing my soul to the devil_2" />
-    <option name="LAST_COMMIT_MESSAGE" value="Committing my soul to the devil_2" />
+    <MESSAGE value="Committing my soul to the devil_3" />
+    <option name="LAST_COMMIT_MESSAGE" value="Committing my soul to the devil_3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/NumberRecognitionApp$manage.coverage" NAME="manage Coverage Results" MODIFIED="1767529789370" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
