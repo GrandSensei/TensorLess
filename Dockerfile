@@ -1,5 +1,5 @@
-# 1. Use Python 3.10 as the base
-FROM python:3.10-slim
+# 1. Use Python 3.12 as the base
+FROM python:3.12-slim
 
 # 2. Install Java (OpenJDK 17) and system tools
 RUN apt-get update && \
