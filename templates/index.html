@@ -1,310 +1,520 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Hybrid Neural Interface</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TensorLess</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; text-align: center; background: #f4f4f4; }
-        .container { background: white; padding: 20px; border-radius: 8px; display: inline-block; margin-top: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        canvas { border: 2px solid #333; cursor: crosshair; background: black; } /* MNIST is white on black */
-        button { padding: 10px 20px; font-size: 16px; margin: 10px; cursor: pointer; }
-        #result { font-size: 40px; font-weight: bold; color: #007bff; }
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            /* Technical Dot Pattern Background */
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .main-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 40px;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        /* --- CARDS --- */
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05), 0 0 0 1px var(--border);
+            padding: 30px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative "Tech" line at top of cards */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0.8;
+        }
+
+        h1 { font-size: 2rem; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -0.5px; color: var(--text-main); }
+        h2 { font-size: 1.1rem; font-weight: 600; margin: 0 0 15px 0; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+
+        .subtitle { color: var(--text-muted); font-size: 1rem; margin-bottom: 30px; line-height: 1.5; }
+
+        /* --- LEFT COL: DRAWING & BIO --- */
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        canvas {
+            border: 4px solid #1e293b;
+            border-radius: 12px;
+            background: #000;
+            cursor: crosshair;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+        }
+
+        .controls { margin-top: 25px; display: flex; gap: 15px; width: 100%; justify-content: center; }
+
+        button {
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-predict {
+            background: var(--primary); color: white;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+            flex: 1;
+            max-width: 200px;
+        }
+        .btn-predict:hover { transform: translateY(-2px); background: var(--primary-dark); }
+        .btn-predict:disabled { background: #94a3b8; transform: none; cursor: wait; }
+
+        .btn-clear { background: white; border: 1px solid var(--border); color: var(--text-muted); }
+        .btn-clear:hover { background: #f8fafc; color: var(--danger); border-color: #fca5a5; }
+
+        /* --- BIO SECTION (NEW) --- */
+        .bio-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        .avatar {
+            width: 50px; height: 50px;
+            background: #e2e8f0;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+        }
+        .tech-stack {
+            display: flex; gap: 8px; margin-top: 10px;
+        }
+        .tech-badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: #eff6ff;
+            color: var(--primary);
+            font-weight: 600;
+            border: 1px solid #dbeafe;
+        }
+
+        /* --- RIGHT COL: STATS --- */
+        .right-col { display: flex; flex-direction: column; gap: 25px; }
+
+        .stat-header {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .prediction-result { text-align: center; padding: 10px 0; }
+
+        .big-number {
+            font-size: 6rem;
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        /* Graph Box */
+        #graph-container {
+            background: #fff;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Feedback UI */
+        .feedback-box {
+            background: #f0f9ff;
+            border: 1px dashed #bae6fd;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        .btn-yes { background: var(--success); color: white; width: 48%; }
+        .btn-no { background: var(--danger); color: white; width: 48%; }
+
+        .correction-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
+        .btn-num { background: white; border: 1px solid var(--border); padding: 8px; border-radius: 6px; }
+        .btn-num:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
+
+        /* History */
+        .history-list { max-height: 250px; overflow-y: auto; padding-right: 5px; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .badge { font-size: 0.7rem; padding: 4px 8px; border-radius: 6px; font-weight: 600; text-transform: uppercase; }
+        .badge-pending { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
+        .badge-correct { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
+        .badge-wrong { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
+
+        .btn-download {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .btn-download:hover { background: #f1f5f9; color: var(--text-main); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-wrapper { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Legacy Java Engine Bridge</h1>
-        <p>Draw a digit (0-9)</p>
-        <canvas id="canvas" width="280" height="280"></canvas>
-        <br>
-        <button onclick="clearCanvas()">Clear</button>
-        <button onclick="predict()">Predict (Run Java)</button>
-        <div id="result">?</div>
-        <div id="feedback-section" style="display:none; margin-top: 15px; background: #fff3e0; padding: 10px; border-radius: 8px;">
 
-            <div id="feedback-question">
-                <p style="margin: 0 0 10px 0;">Is this correct?</p>
-                <button onclick="sendFeedback(true)" style="background: #4caf50; color: white;">Yes ✅</button>
-                <button onclick="showCorrectionUI()" style="background: #f44336; color: white;">No ❌</button>
-            </div>
+<div class="main-wrapper">
 
-            <div id="correction-buttons" style="display:none; margin-top: 10px;">
-                <p>What is the correct digit?</p>
-                <script>
-                    for(let i=0; i<=9; i++) {
-                        document.write(`<button onclick="sendFeedback(false, ${i})" style="padding:5px 10px; margin:2px;">${i}</button>`);
-                    }
-                </script>
-            </div>
-
-            <div id="feedback-success" style="display:none;">
-                <p style="color: green; font-weight: bold; margin: 0;">Saved to Dataset! ✅</p>
-            </div>
-
+    <div class="card">
+        <h1>Hybrid Neural Interface</h1>
+        <div class="subtitle">
+            A high-performance digit recognizer bridge. <br>
+            <strong>Python (Django)</strong> handles the web, <strong>Java</strong> handles the Math.
         </div>
-        <div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px;">
-            <div style="background-color: #e8f5e9; padding: 10px; border-radius: 5px; display: inline-block;">
-                <span style="font-size: 1.2em;">🌍 Community Predictions: </span>
-                <strong id="global-count" style="font-size: 1.5em; color: #2e7d32;">-</strong>
-            </div>
 
-            <div id="history-list" style="margin-top: 20px; text-align: left; max-width: 300px; margin-left: auto; margin-right: auto;">
+        <div class="canvas-container">
+            <canvas id="canvas" width="280" height="280"></canvas>
+
+            <div class="controls">
+                <button class="btn-clear" onclick="clearCanvas()">Clear Board</button>
+                <button class="btn-predict" onclick="predict()" id="predictBtn">Run Prediction ⚡</button>
+            </div>
+        </div>
+
+        <div class="bio-section">
+            <div class="avatar">👨‍💻</div> <div>
+                <h3 style="margin:0; font-size: 1rem;">Project Architecture</h3>
+                <p style="margin: 5px 0 10px 0; font-size: 0.9rem; color: var(--text-muted);">
+                    This system uses a custom-built Java Neural Network engine (No TensorFlow/PyTorch) communicating with Django via TCP Sockets for real-time inference.
+                </p>
+                <div class="tech-stack">
+                    <span class="tech-badge">Java Core</span>
+                    <span class="tech-badge">Python/Django</span>
+                    <span class="tech-badge">TCP Sockets</span>
+                    <span class="tech-badge">Neon DB</span>
+                </div>
             </div>
         </div>
     </div>
 
+    <div class="right-col">
 
+        <div class="card">
+            <h2>
+                <span>📊</span> Live Analysis
+            </h2>
 
+            <div class="prediction-result">
+                <div class="big-number" id="result">?</div>
 
+                <div id="graph-container">
+                    <img id="confidence-graph" src="" style="width: 100%; border-radius: 4px;" alt="Confidence Graph">
+                </div>
 
-    <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        let painting = false;
-        let currentLogId = null;
+                <div id="feedback-section" style="display:none;" class="feedback-box">
+                    <div id="feedback-question">
+                        <p style="margin: 0 0 10px 0; font-weight: 600; font-size: 0.9rem;">Is this correct?</p>
+                        <div style="display: flex; justify-content: space-between;">
+                            <button class="btn-yes" onclick="sendFeedback(true)">Yes</button>
+                            <button class="btn-no" onclick="showCorrectionUI()">No</button>
+                        </div>
+                    </div>
 
-        // Setup drawing (White on Black to match MNIST)
-        ctx.fillStyle = "black";
+                    <div id="correction-buttons" style="display:none;">
+                        <p style="margin: 0 0 10px 0; font-size: 0.9rem;">Correction:</p>
+                        <div class="correction-grid">
+                            <script>
+                                for(let i=0; i<=9; i++) document.write(`<button class="btn-num" onclick="sendFeedback(false, ${i})">${i}</button>`);
+                            </script>
+                        </div>
+                    </div>
+
+                    <div id="feedback-success" style="display:none; color: var(--success); font-weight: 600;">
+                        Feedback Saved! ✅
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2><span>🕒</span> History</h2>
+                <div style="text-align: right;">
+                    <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">Community Total</span>
+                    <strong style="color: var(--success); font-size: 1.1rem;" id="global-count">{{ global_count }}</strong>
+                </div>
+            </div>
+
+            <div id="history-list" class="history-list">
+                </div>
+
+            <a href="/download-data/" class="btn-download">
+                📥 Download Training Data (CSV)
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    /* --- SAME JAVASCRIPT AS BEFORE --- */
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let painting = false;
+    let currentLogId = null;
+
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 20;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    function startPosition(e) { painting = true; draw(e); }
+    function endPosition() { painting = false; ctx.beginPath(); }
+    function draw(e) {
+        if (!painting) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+
+    canvas.addEventListener('mousedown', startPosition);
+    canvas.addEventListener('mouseup', endPosition);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseleave', endPosition);
+
+    function clearCanvas() {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = 20; // Thick lines for better detection
-        ctx.lineCap = "round";
+        document.getElementById('result').innerText = "?";
+        document.getElementById('graph-container').style.display = 'none';
+        document.getElementById('feedback-section').style.display = 'none';
+        currentLogId = null;
+    }
 
-        function startPosition(e) { painting = true; draw(e); }
-        function endPosition() { painting = false; ctx.beginPath(); }
-        function draw(e) {
-            if (!painting) return;
-            const rect = canvas.getBoundingClientRect();
-            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    async function predict() {
+        const btn = document.getElementById('predictBtn');
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        let pixels = getCenteredPixels(canvas);
+        if (!pixels) {
+            alert("Please draw something first!");
+            btn.disabled = false; btn.innerText = "Run Prediction ⚡";
+            return;
         }
 
-        canvas.addEventListener('mousedown', startPosition);
-        canvas.addEventListener('mouseup', endPosition);
-        canvas.addEventListener('mousemove', draw);
-
-        function clearCanvas() {
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            document.getElementById('result').innerText = "?";
-        }
-
-        async function predict() {
-            // --- UPDATED LOGIC START ---
-
-            // 1. Get the "Smart" Centered Pixels
-            let pixels = getCenteredPixels(canvas);
-
-            // Safety check: If user clicked predict on an empty canvas
-            if (!pixels) {
-                alert("Please draw a digit first!");
-                return;
-            }
-
-            // --- UPDATED LOGIC END ---
-
-            // 2. Send to Django (This part stays the same)
+        try {
             const response = await fetch('/predict/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ pixels: pixels })
             });
-
             const result = await response.json();
 
-            // 3. UI Updates (Same as before)
             document.getElementById('result').innerText = result.digit;
 
+            if (result.graph_image) {
+                document.getElementById('confidence-graph').src = result.graph_image;
+                document.getElementById('graph-container').style.display = 'block';
+            }
             if (result.global_count) {
                 document.getElementById('global-count').innerText = result.global_count;
             }
 
             currentLogId = result.log_id;
-            // 3. Reset and Show Feedback UI
-            // 1. Show the main section
+
             document.getElementById('feedback-section').style.display = 'block';
-
-            // 2. Show the "Question" buttons
             document.getElementById('feedback-question').style.display = 'block';
-
-            // 3. Hide the "Correction" and "Success" parts from previous turns
             document.getElementById('correction-buttons').style.display = 'none';
             document.getElementById('feedback-success').style.display = 'none';
+
             saveToHistory(null, result.digit);
+
+        } catch (error) {
+            console.error(error);
+            alert("System Error: Check backend connection.");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Run Prediction ⚡";
         }
-       // --- HISTORY LOGIC START ---
-const HISTORY_KEY = 'digit_app_history';
+    }
 
-// 1. Initial Save (Called inside predict())
-function saveToHistory(pixelData, predictedDigit) {
-    let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    function getCenteredPixels(sourceCanvas) {
+        const ctx = sourceCanvas.getContext('2d');
+        const width = sourceCanvas.width;
+        const height = sourceCanvas.height;
+        const imgData = ctx.getImageData(0, 0, width, height);
+        const data = imgData.data;
+        let minX = width, minY = height, maxX = 0, maxY = 0, found = false;
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                if (data[(y * width + x) * 4] > 0) {
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+                    if (y < minY) minY = y;
+                    if (y > maxY) maxY = y;
+                    found = true;
+                }
+            }
+        }
+        if (!found) return null;
+        const cropW = maxX - minX + 1;
+        const cropH = maxY - minY + 1;
+        const size = 20;
+        const scale = size / Math.max(cropW, cropH);
+        const scaledW = cropW * scale;
+        const scaledH = cropH * scale;
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 28; tempCanvas.height = 28;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.fillStyle = "black";
+        tempCtx.fillRect(0, 0, 28, 28);
+        tempCtx.drawImage(sourceCanvas, minX, minY, cropW, cropH, (28-scaledW)/2, (28-scaledH)/2, scaledW, scaledH);
+        const finalData = tempCtx.getImageData(0, 0, 28, 28);
+        const pixels = [];
+        for (let i = 0; i < finalData.data.length; i += 4) pixels.push(finalData.data[i] / 255.0);
+        return pixels;
+    }
 
-    history.unshift({
-        timestamp: new Date().toLocaleTimeString(),
-        digit: predictedDigit,
-        status: 'pending', // New field: pending, correct, or wrong
-        actual: null       // New field: stores the real number if wrong
-    });
-
-    if (history.length > 5) history.pop();
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-    renderHistory();
-}
-
-// 2. Update History (Called inside sendFeedback())
-function updateHistoryWithFeedback(isCorrect, correctDigit) {
-    let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-
-    // We assume the most recent entry (index 0) is the current one
-    if (history.length > 0) {
-        history[0].status = isCorrect ? 'correct' : 'wrong';
-        history[0].actual = isCorrect ? history[0].digit : correctDigit;
-
+    const HISTORY_KEY = 'digit_app_history';
+    function saveToHistory(pixelData, predictedDigit) {
+        let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+        history.unshift({
+            timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+            digit: predictedDigit,
+            status: 'pending',
+            actual: null
+        });
+        if (history.length > 10) history.pop();
         localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
         renderHistory();
     }
-}
 
-// 3. Render the List (Called on load and updates)
-function renderHistory() {
-    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-    const container = document.getElementById('history-list');
-
-    container.innerHTML = '<h3>My Recent Attempts</h3>';
-
-    history.forEach(item => {
-        let statusIcon = '⏳'; // Default pending
-        let details = `Pred: <b>${item.digit}</b>`;
-
-        if (item.status === 'correct') {
-            statusIcon = '✅';
-        } else if (item.status === 'wrong') {
-            statusIcon = '❌';
-            details += ` (Actual: <b>${item.actual}</b>)`; // Show the correction
+    function updateHistoryWithFeedback(isCorrect, correctDigit) {
+        let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+        if (history.length > 0) {
+            history[0].status = isCorrect ? 'correct' : 'wrong';
+            history[0].actual = isCorrect ? history[0].digit : correctDigit;
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            renderHistory();
         }
+    }
 
-        // Add a nice styled box for each item
-        container.innerHTML += `
-            <div style="border-bottom: 1px solid #eee; padding: 5px 0; font-size: 0.9em;">
-                <span style="float: right;">${item.timestamp}</span>
-                <span>${statusIcon} ${details}</span>
-            </div>
-        `;
-    });
-}
-// --- HISTORY LOGIC END ---
-
-        // 4. CALL THIS ON LOAD
-        document.addEventListener('DOMContentLoaded', renderHistory);
-
-        // --- NEW HELPER FUNCTION: AUTO-CENTERING ---
-        function getCenteredPixels(sourceCanvas) {
-            const ctx = sourceCanvas.getContext('2d');
-            const width = sourceCanvas.width;
-            const height = sourceCanvas.height;
-            const imgData = ctx.getImageData(0, 0, width, height);
-            const data = imgData.data;
-
-            // 1. Find Bounding Box (where the drawing actually is)
-            let minX = width, minY = height, maxX = 0, maxY = 0;
-            let found = false;
-
-            for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    // Check alpha (transparency) or brightness
-                    // Since we draw white on black, we check Red channel > 0
-                    const index = (y * width + x) * 4;
-                    if (data[index] > 0) { // If pixel is not black
-                        if (x < minX) minX = x;
-                        if (x > maxX) maxX = x;
-                        if (y < minY) minY = y;
-                        if (y > maxY) maxY = y;
-                        found = true;
-                    }
-                }
-            }
-
-            // If canvas is empty, just return standard empty pixels
-            if (!found) return null;
-
-            // 2. Crop the digit
-            const cropWidth = maxX - minX + 1;
-            const cropHeight = maxY - minY + 1;
-
-            // 3. Scale into a 20x20 box (MNIST standard inner box)
-            // We preserve aspect ratio!
-            const size = 20;
-            const scale = size / Math.max(cropWidth, cropHeight);
-
-            const scaledWidth = cropWidth * scale;
-            const scaledHeight = cropHeight * scale;
-
-            // 4. Create a Temporary Canvas to do the resizing
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = 28;  // Final MNIST size
-            tempCanvas.height = 28;
-            const tempCtx = tempCanvas.getContext('2d');
-
-            // Fill with Black first
-            tempCtx.fillStyle = "black";
-            tempCtx.fillRect(0, 0, 28, 28);
-
-            // 5. Draw the cropped image into the CENTER of the 28x28 box
-            // Center X = (28 - width) / 2
-            const offsetX = (28 - scaledWidth) / 2;
-            const offsetY = (28 - scaledHeight) / 2;
-
-            // Draw using high quality smoothing
-            tempCtx.imageSmoothingEnabled = true;
-            tempCtx.drawImage(
-                sourceCanvas,
-                minX, minY, cropWidth, cropHeight, // Source crop
-                offsetX, offsetY, scaledWidth, scaledHeight // Destination location
-            );
-
-            // 6. Extract the final 28x28 pixels
-            const finalData = tempCtx.getImageData(0, 0, 28, 28);
-            const pixels = [];
-            for (let i = 0; i < finalData.data.length; i += 4) {
-                // Normalize 0-255 -> 0.0-1.0
-                pixels.push(finalData.data[i] / 255.0);
-            }
-
-            return pixels;
+    function renderHistory() {
+        const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+        const container = document.getElementById('history-list');
+        if (history.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #ccc; padding: 20px;">No attempts yet</div>';
+            return;
         }
+        let html = '';
+        history.forEach(item => {
+            let badge = `<span class="badge badge-pending">Pending</span>`;
+            let result = `<strong style="font-size:1.1em">${item.digit}</strong>`;
+            if (item.status === 'correct') badge = `<span class="badge badge-correct">Correct</span>`;
+            if (item.status === 'wrong') {
+                badge = `<span class="badge badge-wrong">Wrong</span>`;
+                result += ` <span style="color:var(--danger); font-size:0.9em">➔ ${item.actual}</span>`;
+            }
+            html += `
+                <div class="history-item">
+                    <div>${result}</div>
+                    <div style="text-align:right">
+                        ${badge}
+                        <div style="font-size:0.75rem; color:#ccc; margin-top:2px;">${item.timestamp}</div>
+                    </div>
+                </div>`;
+        });
+        container.innerHTML = html;
+    }
 
-        function showCorrectionUI() {
+    function showCorrectionUI() {
         document.getElementById('feedback-question').style.display = 'none';
         document.getElementById('correction-buttons').style.display = 'block';
-        }
+    }
 
+    async function sendFeedback(isCorrect, correctDigit = null) {
+        if (!currentLogId) return;
+        updateHistoryWithFeedback(isCorrect, correctDigit);
+        await fetch('/feedback/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                log_id: currentLogId,
+                is_correct: isCorrect,
+                correct_digit: correctDigit
+            })
+        });
+        document.getElementById('feedback-question').style.display = 'none';
+        document.getElementById('correction-buttons').style.display = 'none';
+        document.getElementById('feedback-success').style.display = 'block';
+        setTimeout(() => { document.getElementById('feedback-section').style.display = 'none'; }, 1500);
+    }
+    document.addEventListener('DOMContentLoaded', renderHistory);
+</script>
 
-        async function sendFeedback(isCorrect, correctDigit = null) {
-            if (!currentLogId) return;
-            updateHistoryWithFeedback(isCorrect, correctDigit);
-            await fetch('/feedback/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    log_id: currentLogId,
-                    is_correct: isCorrect,
-                    correct_digit: correctDigit
-                })
-            });
-
-            // Hide the buttons (both Yes/No and 0-9)
-            document.getElementById('feedback-question').style.display = 'none';
-            document.getElementById('correction-buttons').style.display = 'none';
-
-            // Show the Success Message
-            document.getElementById('feedback-success').style.display = 'block';
-
-            // Optional: Hide the whole box after 2 seconds
-            setTimeout(() => {
-                document.getElementById('feedback-section').style.display = 'none';
-            }, 2000);
-        }
-    </script>
 </body>
-
 </html>

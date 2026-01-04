@@ -22,7 +22,8 @@ public class Predictor {
             nn.setInput(inputs);
 
             nn.forwardPass();
-
+            nn.printConfidences();
+            // ---------------------
             int result = nn.getPredictedDigit();
 
             System.out.println("PREDICTION_RESULT:" + result);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="dataSourceStorageLocal" created-in="PY-251.29188.22">
-    <data-source name="neondb@ep-summer-fire-ab756z5v-pooler.eu-west-2.aws.neon.tech" uuid="a9cf3e73-7b3a-46e1-9882-a3e5f5ab97e6">
+    <data-source name="neondb_owner:npg_OXHBqQ0UVD9k@ep-summer-fire-ab756z5v-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&amp;channel_binding=require" uuid="884ffac2-5431-4f00-9178-d7edd4f6f12a">
       <database-info product="PostgreSQL" version="17.7 (bdc8956)" jdbc-version="4.2" driver-name="PostgreSQL JDBC Driver" driver-version="42.7.3" dbms="POSTGRES" exact-version="17.7" exact-driver-version="42.7">
         <identifier-quote-string>&quot;</identifier-quote-string>
       </database-info>

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/NumberRecognitionApp.iml" filepath="$PROJECT_DIR$/.idea/NumberRecognitionApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/TensorLess.iml" filepath="$PROJECT_DIR$/.idea/TensorLess.iml" />
     </modules>
   </component>
 </project>

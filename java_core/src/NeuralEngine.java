@@ -6,7 +6,7 @@ public class NeuralEngine {
 
 
 
-    private NeuralNetwork neuralNetwork;
+    public NeuralNetwork neuralNetwork;
 
     private float[][] trainingData;
     private List<List<Float>> testData;
@@ -139,7 +139,7 @@ public class NeuralEngine {
 
 
     //turns out it is simpler to just do it in the training method itself here. I will switch this in python one though.
-//populate the inputs!
+    //populate the inputs!
     public void setInput(float[] inputs){
         if(inputs.length!=INPUT_SIZE) return;
         for(int i=0;i<INPUT_SIZE;++i){
@@ -151,67 +151,134 @@ public class NeuralEngine {
 //        }
     }
 
-
-    public void train(int epochs){
-
+    public void train(int epochs) {
         // initialize the weights that are needed to be modified
-    for (int e = 0; e < epochs; e++) {
-        int iterations = trainingData.length / BATCH_SIZE;
-        //no of the partitions you made of the data
-        for (int i = 0; i < iterations; ++i) {
+        for (int e = 0; e < epochs; e++) {
+            int iterations = trainingData.length / BATCH_SIZE;
+            //no of the partitions you made of the data
+            for (int i = 0; i < iterations; ++i) {
 
 
-            float cost = 0;
-            // the data in the given partition
-            int start = i * BATCH_SIZE;
-            //first populate the inputs
-            for (int j = start; j < start + BATCH_SIZE; ++j) {
-                float[] inputs = trainingData[j];
-                List<Neuron> inputLayer = neuralNetwork.getNeurons().getFirst();
-                // k = 1 as the 0th index is the label
-                for (int k = 1; k < trainingData[j].length; ++k) {
-                    //set the input layer of neurons
-                    float input = inputs[k];
-                    inputLayer.get(k - 1).setVal(input);
-                }
+                float cost = 0;
+                // the data in the given partition
+                int start = i * BATCH_SIZE;
+                //first populate the inputs
+                for (int j = start; j < start + BATCH_SIZE; ++j) {
+                    float[] inputs = trainingData[j];
+                    List<Neuron> inputLayer = neuralNetwork.getNeurons().getFirst();
+                    // k = 1 as the 0th index is the label
+                    for (int k = 1; k < trainingData[j].length; ++k) {
+                        //set the input layer of neurons
+                        float input = inputs[k];
+                        inputLayer.get(k - 1).setVal(input);
+                    }
 
-            // do the forward pass once you have set the inputs
-            forwardPass();
+                    // do the forward pass once you have set the inputs
+                    forwardPass();
 
-            cost += calculateCostFunction(j);
+                    cost += calculateCostFunction(j);
 
-            float label = inputs[0];
-            float[] targets = new float[OUTPUT_SIZE];
-            for (int x = 0; x < OUTPUT_SIZE; ++x) {
-                if (x == label) targets[x] = 1.0f;
-                else targets[x] = 0.f;
-            }
+                    float label = inputs[0];
+                    float[] targets = new float[OUTPUT_SIZE];
+                    for (int x = 0; x < OUTPUT_SIZE; ++x) {
+                        if (x == label) targets[x] = 1.0f;
+                        else targets[x] = 0.f;
+                    }
 
-            //We calculate the changes we want to make to each weight from the cost function we just made above.
-            backpropagate(targets);
-            if (j % 1000 == 0) {
-                System.out.print("Target: " + label + " | Prediction: ");
-                List<Neuron> out = neuralNetwork.getNeurons().getLast();
-                int bestGuess = 0;
-                float bestVal = 0;
-                for(int k=0; k<10; k++) {
-                    // Print the raw output to see if they are all 0.5 or 0.0
-                    // System.out.print(String.format("%.2f ", out.get(k).getActivation()));
-                    if(out.get(k).getActivation() > bestVal) {
-                        bestVal = out.get(k).getActivation();
-                        bestGuess = k;
+                    //We calculate the changes we want to make to each weight from the cost function we just made above.
+                    backpropagate(targets);
+                    if (j % 1000 == 0) {
+                        System.out.print("Target: " + label + " | Prediction: ");
+                        List<Neuron> out = neuralNetwork.getNeurons().getLast();
+                        int bestGuess = 0;
+                        float bestVal = 0;
+                        for(int k=0; k<10; k++) {
+                            // Print the raw output to see if they are all 0.5 or 0.0
+                            // System.out.print(String.format("%.2f ", out.get(k).getActivation()));
+                            if(out.get(k).getActivation() > bestVal) {
+                                bestVal = out.get(k).getActivation();
+                                bestGuess = k;
+                            }
+                        }
+                        System.out.println("-> " + bestGuess);
                     }
                 }
-                System.out.println("-> " + bestGuess);
+
+
+                cost /= BATCH_SIZE;
+                System.out.println("The cost is " + cost);
             }
+            ++e;
         }
 
-
-        cost /= BATCH_SIZE;
-        System.out.println("The cost is " + cost);
     }
-    ++e;
-}
+
+
+
+    //I have overloaded the method for further customizability. You can specify your learning rate instead of using the default one
+
+    private float learningRate;
+    public void train(int epochs, float learningRate) {
+
+        this.learningRate = learningRate;
+            // initialize the weights that are needed to be modified
+        for (int e = 0; e < epochs; e++) {
+            int iterations = trainingData.length / BATCH_SIZE;
+            //no of the partitions you made of the data
+            for (int i = 0; i < iterations; ++i) {
+
+
+                float cost = 0;
+                // the data in the given partition
+                int start = i * BATCH_SIZE;
+                //first populate the inputs
+                for (int j = start; j < start + BATCH_SIZE; ++j) {
+                    float[] inputs = trainingData[j];
+                    List<Neuron> inputLayer = neuralNetwork.getNeurons().getFirst();
+                    // k = 1 as the 0th index is the label
+                    for (int k = 1; k < trainingData[j].length; ++k) {
+                        //set the input layer of neurons
+                        float input = inputs[k];
+                        inputLayer.get(k - 1).setVal(input);
+                    }
+
+                // do the forward pass once you have set the inputs
+                forwardPass();
+
+                cost += calculateCostFunction(j);
+
+                float label = inputs[0];
+                float[] targets = new float[OUTPUT_SIZE];
+                for (int x = 0; x < OUTPUT_SIZE; ++x) {
+                    if (x == label) targets[x] = 1.0f;
+                    else targets[x] = 0.f;
+                }
+
+                //We calculate the changes we want to make to each weight from the cost function we just made above.
+                backpropagate(targets,this.learningRate);
+                if (j % 1000 == 0) {
+                    System.out.print("Target: " + label + " | Prediction: ");
+                    List<Neuron> out = neuralNetwork.getNeurons().getLast();
+                    int bestGuess = 0;
+                    float bestVal = 0;
+                    for(int k=0; k<10; k++) {
+                        // Print the raw output to see if they are all 0.5 or 0.0
+                        // System.out.print(String.format("%.2f ", out.get(k).getActivation()));
+                        if(out.get(k).getActivation() > bestVal) {
+                            bestVal = out.get(k).getActivation();
+                            bestGuess = k;
+                        }
+                    }
+                    System.out.println("-> " + bestGuess);
+                }
+            }
+
+
+            cost /= BATCH_SIZE;
+            System.out.println("The cost is " + cost);
+        }
+        ++e;
+    }
 
     }
 
@@ -229,6 +296,25 @@ public class NeuralEngine {
             }
         }
         return bestIndex;
+    }
+
+    public void printConfidences() {
+        // 1. Get the last layer (Output Layer)
+        List<Neuron> outputLayer = neuralNetwork.getNeurons().getLast();
+
+        System.out.print("CONFIDENCES:");
+
+        // 2. Loop through all 10 neurons
+        for (int i = 0; i < outputLayer.size(); i++) {
+            // Print the activation (probability)
+            System.out.print(outputLayer.get(i).getActivation());
+
+            // Add a comma if it's not the last one
+            if (i < outputLayer.size() - 1) {
+                System.out.print(",");
+            }
+        }
+        System.out.println(); // End the line
     }
 
     public void test(float[][] testData) {
@@ -337,6 +423,69 @@ public class NeuralEngine {
 
     }
 
+    public void backpropagate(float[] targets,float learningRate){
+        List<List<Neuron>> layers = neuralNetwork.getNeurons();
+        Weights weights = neuralNetwork.getWeights();
+
+        //We will store the errors of the current layer processed
+        float[] errors = new float[OUTPUT_SIZE];
+
+        //calculate the output layer error
+        int outputLayerIndex = layers.size() - 1;
+        // System.out.println(outputLayerIndex);
+        List<Neuron> outputLayer = layers.get(outputLayerIndex);
+
+        for (int x = 0; x < OUTPUT_SIZE; ++x) {
+            Neuron neuron = outputLayer.get(x);
+            float error = (neuron.getActivation() - targets[x]);
+            errors[x] = error;
+
+            //update the bias
+            neuron.setBias(neuron.getBias() - learningRate * error);
+        }
+
+
+        // calculate the errors in hidden layers
+        for (int midLayer = layers.size() - 2; midLayer >= 0; --midLayer) {
+            List<Neuron> currentLayerNeurons = layers.get(midLayer);
+            List<Neuron> nextLayerNeurons = layers.get(midLayer + 1);
+
+            // new array to store the errors of the current layer
+            float[] currentLayerErrors = new float[currentLayerNeurons.size()];
+            for (int currentNeuron = 0; currentNeuron < currentLayerNeurons.size(); ++currentNeuron) {
+                Neuron currentLayerNeuron = currentLayerNeurons.get(currentNeuron);
+
+                float errorSum = 0;
+
+                // calculate the gradient based on layer ahead
+                for (int nextNeuron = 0; nextNeuron < nextLayerNeurons.size(); ++nextNeuron) {
+                    float weight = weights.getWeight(midLayer, currentNeuron, nextNeuron);
+
+                    //the error sum that came from the coming layer
+                    errorSum += weight * errors[nextNeuron];
+
+                    //update the weight
+                    float gradient = errors[nextNeuron] * currentLayerNeuron.getActivation();
+                    float updatedWeight = weight - learningRate * gradient;
+                    weights.setWeight(midLayer, currentNeuron, nextNeuron, updatedWeight);
+
+                }
+
+                // calculate error for this neuron for layer before it
+                currentLayerErrors[currentNeuron] = errorSum * currentLayerNeuron.getSigmoidDerivative();
+
+                if (midLayer > 0) {
+                    float newBias = currentLayerNeuron.getBias() - learningRate * currentLayerErrors[currentNeuron];
+                    currentLayerNeuron.setBias(newBias);
+                }
+
+
+            }
+            errors = currentLayerErrors;
+        }
+
+
+    }
 
 
     //the inputs range is not -1,1 so be careful to parse that later

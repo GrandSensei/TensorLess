@@ -82,16 +82,23 @@ WSGI_APPLICATION = 'NumberRecognitionApp.wsgi.application'
 # 1. Default to SQLite (so it still works if you lose internet)
 
 
+# Add these at the top of your settings.py
+from urllib.parse import urlparse, parse_qsl
+
 load_dotenv()
+
+# Replace the DATABASES section of your settings.py with this
+tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),      # <--- Reads from .env
-        'USER': os.getenv('DB_USER'),      # <--- Reads from .env
-        'PASSWORD': os.getenv('DB_PASSWORD'), # <--- Reads from .env
-        'HOST': os.getenv('DB_HOST'),      # <--- Reads from .env
-        'PORT': '5432',
+        'NAME': tmpPostgres.path.replace('/', ''),
+        'USER': tmpPostgres.username,
+        'PASSWORD': tmpPostgres.password,
+        'HOST': tmpPostgres.hostname,
+        'PORT': 5432,
+        'OPTIONS': dict(parse_qsl(tmpPostgres.query)),
     }
 }
 
