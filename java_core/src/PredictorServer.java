@@ -68,10 +68,10 @@ public class PredictorServer {
             int result = nn.getPredictedDigit();
             out.println("PREDICTION_RESULT:" + result);
 
-            System.out.println("Processed request. Result: " + result);
+            System.out.println("[Java-side] Processed request. Result: " + result);
 
         } catch (Exception e) {
-            System.err.println("Error handling client: " + e.getMessage());
+            System.err.println("[Java-side] Error handling client: " + e.getMessage());
         } finally {
             try { socket.close(); } catch (IOException e) { /* ignore */ }
         }

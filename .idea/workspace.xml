@@ -4,33 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="650e3c2f-daa7-42ce-9df7-30ba6ca3fab8" name="Changes" comment="this is the first commit">
-      <change afterPath="$PROJECT_DIR$/java_core/bin/model_1.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/java_core/src/PredictorServer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/java_core/src/model_1.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a9cf3e73-7b3a-46e1-9882-a3e5f5ab97e6.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a9cf3e73-7b3a-46e1-9882-a3e5f5ab97e6/storage_v2/_src_/database/postgres.edMnLQ.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a9cf3e73-7b3a-46e1-9882-a3e5f5ab97e6/storage_v2/_src_/database/postgres.edMnLQ/schema/information_schema.FNRwLQ.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a9cf3e73-7b3a-46e1-9882-a3e5f5ab97e6/storage_v2/_src_/database/postgres.edMnLQ/schema/pg_catalog.0S1ZNQ.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a9cf3e73-7b3a-46e1-9882-a3e5f5ab97e6/storage_v2/_src_/database/postgres.edMnLQ/schema/public.abK9xQ.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a9cf3e73-7b3a-46e1-9882-a3e5f5ab97e6/storage_v2/_src_/database/postgres.edMnLQ/schema/public.abK9xQ.zip" beforeDir="false" />
+    <list default="true" id="650e3c2f-daa7-42ce-9df7-30ba6ca3fab8" name="Changes" comment="Added a TCP server for Java to interact with the requests. Did a UI overhaul to make it look nicer">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NumberRecognitionApp/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/NumberRecognitionApp/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_core/bin/Biases.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_core/bin/ExcelParse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_core/bin/NeuralEngine.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_core/bin/NeuralNetwork.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_core/bin/Neuron.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_core/bin/Predictor.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_core/bin/Weights.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_core/bin/main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_core/src/NeuralEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_core/src/NeuralEngine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_core/src/Predictor.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_core/src/Predictor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_core/src/main.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_core/src/main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web_dashboard/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_dashboard/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java_core/src/PredictorServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_core/src/PredictorServer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web_dashboard/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_dashboard/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -50,6 +26,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="UPDATE_TYPE" value="REBASE" />
   </component>
@@ -83,14 +64,14 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "django.template.preview.state": "SHOW_EDITOR",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "UI__TCPServer",
     "last_opened_file_path": "/Users/mustafa/PycharmProjects/NumberRecognitionApp/java_core/src",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.intellij.pycharm.community.ide.impl.configuration.PythonContentEntriesConfigurable",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -323,7 +304,7 @@
       <workItem from="1767452878624" duration="78000" />
       <workItem from="1767452968123" duration="252000" />
       <workItem from="1767453362798" duration="17237000" />
-      <workItem from="1767529279153" duration="7690000" />
+      <workItem from="1767529279153" duration="9459000" />
     </task>
     <task id="LOCAL-00001" summary="this is the first commit">
       <option name="closed" value="true" />
@@ -341,7 +322,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767468981495</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Added a TCP server for Java to interact with the requests. Did a UI overhaul to make it look nicer">
+      <option name="closed" value="true" />
+      <created>1767538550611</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1767538550611</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -360,7 +349,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="this is the first commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="this is the first commit" />
+    <MESSAGE value="Added a TCP server for Java to interact with the requests. Did a UI overhaul to make it look nicer" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added a TCP server for Java to interact with the requests. Did a UI overhaul to make it look nicer" />
     <option name="LAST_CHUNK_COMMIT_MESSAGE" value="added sslmode too" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">

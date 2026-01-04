@@ -55,7 +55,7 @@ def predict_digit(request):
                 # 1. Connect to the Java Server
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     s.connect((host, port))
-
+                    print(f"[DJANGO] Sending request to Java port {port}...")
                     # 2. Send the pixels (with a newline at the end)
                     s.sendall((input_string + "\n").encode('utf-8'))
 
@@ -73,6 +73,8 @@ def predict_digit(request):
                         if "PREDICTION_RESULT:" in line:
                             prediction = line.split(":")[1].strip()
 
+
+                print(f"[DJANGO] Java responded: {prediction}")
             except ConnectionRefusedError:
                 return JsonResponse({'error': 'Java Server is offline. Please run "java Server" in a terminal.'},
                                     status=500)
