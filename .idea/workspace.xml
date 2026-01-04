@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="650e3c2f-daa7-42ce-9df7-30ba6ca3fab8" name="Changes" comment="Add missing requirements file" />
+    <list default="true" id="650e3c2f-daa7-42ce-9df7-30ba6ca3fab8" name="Changes" comment="Edited the Dockerfile to upgrade version of python" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -301,7 +301,7 @@
       <workItem from="1767452878624" duration="78000" />
       <workItem from="1767452968123" duration="252000" />
       <workItem from="1767453362798" duration="17237000" />
-      <workItem from="1767529279153" duration="11406000" />
+      <workItem from="1767529279153" duration="11798000" />
     </task>
     <task id="LOCAL-00001" summary="this is the first commit">
       <option name="closed" value="true" />
@@ -359,7 +359,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767541650278</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Edited the Dockerfile to upgrade version of python">
+      <option name="closed" value="true" />
+      <created>1767542076690</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1767542076690</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -382,7 +390,8 @@
     <MESSAGE value="Added deployment files(its just dockerfile and a bash file for making sure java server is launched first followed by django)" />
     <MESSAGE value="hiding the keys" />
     <MESSAGE value="Add missing requirements file" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add missing requirements file" />
+    <MESSAGE value="Edited the Dockerfile to upgrade version of python" />
+    <option name="LAST_COMMIT_MESSAGE" value="Edited the Dockerfile to upgrade version of python" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/NumberRecognitionApp$manage.coverage" NAME="manage Coverage Results" MODIFIED="1767529789370" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

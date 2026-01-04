@@ -88,22 +88,38 @@ WSGI_APPLICATION = 'NumberRecognitionApp.wsgi.application'
 # Add these at the top of your settings.py
 from urllib.parse import urlparse, parse_qsl
 
-load_dotenv()
 
-# Replace the DATABASES section of your settings.py with this
-tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+# --- DATABASE CONFIGURATION ---
+# Check if the environment variable exists
+database_url = os.getenv("DATABASE_URL")
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': tmpPostgres.path.replace('/', ''),
-        'USER': tmpPostgres.username,
-        'PASSWORD': tmpPostgres.password,
-        'HOST': tmpPostgres.hostname,
-        'PORT': 5432,
-        'OPTIONS': dict(parse_qsl(tmpPostgres.query)),
+if database_url:
+    # PRODUCTION / LOCAL WITH .ENV
+    # We have a URL, so we parse it to connect to Neon/Postgres
+    tmpPostgres = urlparse(database_url)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': tmpPostgres.path.replace('/', ''),
+            'USER': tmpPostgres.username,
+            'PASSWORD': tmpPostgres.password,
+            'HOST': tmpPostgres.hostname,
+            'PORT': 5432,
+            'OPTIONS': dict(parse_qsl(tmpPostgres.query)),
+        }
     }
-}
+else:
+    # DOCKER BUILD / FALLBACK
+    # The variable is missing (happens during 'collectstatic' on Render).
+    # We use a temporary dummy SQLite DB just to let the build finish.
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+# ------------------------------
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
