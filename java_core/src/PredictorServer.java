@@ -39,7 +39,17 @@ public class PredictorServer {
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true)
         ) {
             // 1. Read the pixels sent by Python
-            String inputLine = in.readLine();
+           String inputLine = in.readLine();
+
+
+
+            // --- NEW CODE: FILTER OUT HEALTH CHECKS ---
+            // If Render sends a standard HTTP health check, ignore it silently.
+            if (inputLine.startsWith("HEAD") || inputLine.startsWith("GET") || inputLine.startsWith("POST")) {
+                // Optional: System.out.println("Health check received. Ignoring.");
+                continue; // Skip the rest of the loop and wait for the next request
+            }
+
             if (inputLine == null) return;
 
             // 2. Parse Data (String "0,0,255..." -> float[])
