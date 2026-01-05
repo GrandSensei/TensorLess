@@ -45,10 +45,10 @@ public class PredictorServer {
 
 
             // If Render sends a standard HTTP health check, ignore it silently.
-         //   if (inputLine.startsWith("HEAD") || inputLine.startsWith("GET") || inputLine.startsWith("POST")) {
+           if (inputLine.startsWith("HEAD") || inputLine.startsWith("GET") || inputLine.startsWith("POST")) {
                 //System.out.println("Health check received.");
-           //     return; // Skip the rest of the loop and wait for the next request
-            //}
+               return; // Skip the rest of the loop and wait for the next request
+            }
 
             if (inputLine == null) return;
 
