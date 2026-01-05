@@ -25,5 +25,5 @@ RUN chmod +x entrypoint.sh
 # 8. Collect Static Files (CSS)
 RUN python manage.py collectstatic --noinput
 
-# 9. Run the app!
+# 9. Run the app
 CMD ["./entrypoint.sh"]

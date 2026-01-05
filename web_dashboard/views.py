@@ -7,11 +7,11 @@ import csv
 import socket
 from django.http import HttpResponse
 
-from django.shortcuts import render  # <--- This was likely missing or unused
+from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import matplotlib
-matplotlib.use('Agg')  # <--- THIS LINE IS THE FIX
+matplotlib.use('Agg')  # mac being weird
 import matplotlib.pyplot as plt
 
 from web_dashboard.models import GlobalStats, PredictionLog
@@ -23,7 +23,7 @@ def index(request):
     """Renders the drawing board homepage with initial stats."""
     total_count = PredictionLog.objects.count()
 
-    # 2. Pass it to the template
+
     return render(request, 'index.html', {'global_count': total_count})
 
 
@@ -64,7 +64,7 @@ def predict_digit(request):
                         output = f.read()
 
 
-                    # 4. Parse the response (Same logic as before)
+                    # 4. Parse the response
                     for line in output.split('\n'):
                         line = line.strip()
                         if "CONFIDENCES:" in line:
@@ -83,7 +83,7 @@ def predict_digit(request):
             # --- GRAPH GENERATION ---
             graph_url = None
             if confidences:
-                # 1. Setup the plot (Clean style)
+                # 1. Setup the plot
                 plt.figure(figsize=(6, 3))  # Width, Height
                 plt.bar(range(10), confidences, color='#2563eb')  # Blue bars
 
@@ -109,7 +109,7 @@ def predict_digit(request):
                 graph_url = f"data:image/png;base64,{graphic}"
 
             '''
-            # --- DEBUGGING: PRINT EXACTLY WHAT JAVA SAID ---
+            # --- DEBUGGING: PRINT WHAT JAVA SAID ---
             print("-" * 20)
             print("JAVA STDOUT:", process.stdout)
             print("JAVA STDERR:", process.stderr)
@@ -193,8 +193,7 @@ def download_training_data(request):
 
     writer = csv.writer(response)
 
-    # 2. Write the Header
-    # (Your Java ExcelParse skips the first line, so we need a header row)
+    # 2. Write the Header as the MNIST style has one
     header = ['label'] + [f'pixel{i}' for i in range(784)]
     writer.writerow(header)
 

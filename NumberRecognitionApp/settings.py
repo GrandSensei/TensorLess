@@ -24,12 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 
-# SECURITY WARNING: keep the secret key used in production secret!
+load_dotenv()
+
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-dev-key-do-not-use-in-production')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
@@ -110,7 +111,6 @@ if database_url:
     }
 else:
     # DOCKER BUILD / FALLBACK
-    # The variable is missing (happens during 'collectstatic' on Render).
     # We use a temporary dummy SQLite DB just to let the build finish.
     DATABASES = {
         'default': {

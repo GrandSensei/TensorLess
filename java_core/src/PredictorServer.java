@@ -5,15 +5,15 @@ import java.net.Socket;
 public class PredictorServer {
 
     public static void main(String[] args) {
-        int port = 9999; // The "Door" Python will knock on
+        int port = 9999;
         System.out.println("----------------------------------------");
         System.out.println("🚀 NEURAL SERVER STARTING ON PORT " + port);
         System.out.println("----------------------------------------");
 
         try {
-            // 1. LOAD THE MODEL ONCE (The heavy lifting)
+            // 1. LOAD THE MODEL ONCE
             System.out.println("Loading Neural Network Model...");
-            NeuralEngine nn = NeuralEngine.loadModel("java_core/src/model.bin");
+            NeuralEngine nn = NeuralEngine.loadModel("model.bin");
             System.out.println("✅ Model Loaded! Ready for predictions.");
 
             // 2. OPEN THE SERVER
@@ -43,12 +43,12 @@ public class PredictorServer {
 
 
 
-            // --- NEW CODE: FILTER OUT HEALTH CHECKS ---
+
             // If Render sends a standard HTTP health check, ignore it silently.
-            if (inputLine.startsWith("HEAD") || inputLine.startsWith("GET") || inputLine.startsWith("POST")) {
-                // Optional: System.out.println("Health check received. Ignoring.");
-                return; // Skip the rest of the loop and wait for the next request
-            }
+         //   if (inputLine.startsWith("HEAD") || inputLine.startsWith("GET") || inputLine.startsWith("POST")) {
+                //System.out.println("Health check received.");
+           //     return; // Skip the rest of the loop and wait for the next request
+            //}
 
             if (inputLine == null) return;
 
@@ -63,9 +63,8 @@ public class PredictorServer {
             nn.setInput(inputs);
             nn.forwardPass();
 
-            // 4. Send "Confidences" back to Python
+            // 4. Send "Confidences" back
             // We have to capture the print output or manually format it string again
-            // Let's manually format it to send over the socket to keep it clean
             StringBuilder confidences = new StringBuilder("CONFIDENCES:");
             var outputLayer = nn.neuralNetwork.getNeurons().getLast();
             for (int i = 0; i < outputLayer.size(); i++) {
@@ -74,7 +73,7 @@ public class PredictorServer {
             }
             out.println(confidences.toString());
 
-            // 5. Send Result back to Python
+            // 5. Send Result back
             int result = nn.getPredictedDigit();
             out.println("PREDICTION_RESULT:" + result);
 
