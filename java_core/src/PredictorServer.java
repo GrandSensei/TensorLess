@@ -13,7 +13,7 @@ public class PredictorServer {
         try {
             // 1. LOAD THE MODEL ONCE
             System.out.println("Loading Neural Network Model...");
-            NeuralEngine nn = NeuralEngine.loadModel("java_core/bin/model.bin");
+            NeuralEngine nn = NeuralEngine.loadModel("model.bin");
             System.out.println("✅ Model Loaded! Ready for predictions.");
 
             // 2. OPEN THE SERVER
