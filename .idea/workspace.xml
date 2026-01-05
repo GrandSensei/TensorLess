@@ -5,14 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="650e3c2f-daa7-42ce-9df7-30ba6ca3fab8" name="Changes" comment="Committing my soul to the devil_5">
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/java_core/bin/model.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/884ffac2-5431-4f00-9178-d7edd4f6f12a.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/884ffac2-5431-4f00-9178-d7edd4f6f12a.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NumberRecognitionApp/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/NumberRecognitionApp/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_core/src/PredictorServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_core/src/PredictorServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web_dashboard/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/web_dashboard/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,14 +71,14 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "django.template.preview.state": "SHOW_EDITOR",
-    "git-widget-placeholder": "UI__TCPServer",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "/Users/mustafa/PycharmProjects/NumberRecognitionApp/java_core/bin",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "settings.editor.selected.configurable": "vcs.Git",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {

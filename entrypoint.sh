@@ -5,8 +5,7 @@ set -e
 
 echo "--- 🛠️ DEPLOYMENT STARTED ---"
 
-# 1. Compile Java (Assuming your files are in java_core/src)
-# If your .java files are just loose in java_core, change this to: java_core/*.java
+# 1. Compile Java
 echo "Compiling Java..."
 javac -d java_core/bin java_core/src/*.java
 
