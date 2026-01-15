@@ -34,124 +34,95 @@ def predict_digit(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            pixel_data = data.get('pixels')
-            input_string = ",".join(map(str, pixel_data))
+            # Expecting a LIST of pixel arrays now
+            # Format: [ [0,0,0...], [0,0,255...] ]
+            pixel_batches = data.get('pixels')
 
-            # --- PATH SETUP ---
-            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            java_bin_path = os.path.join(base_dir, 'java_core', 'bin')
+            # Safety check: If they sent the old format (just one list), wrap it
+            if pixel_batches and isinstance(pixel_batches[0], (int, float)):
+                pixel_batches = [pixel_batches]
 
-            input_string = ",".join(map(str, pixel_data))
+            full_prediction_string = ""
+            log_ids = []
 
-            # --- NEW SOCKET LOGIC START ---
-            host = '127.0.0.1'
-            port = 9999
+            # We will generate a graph only for the FIRST digit (to keep UI clean)
+            first_graph_url = None
 
-            prediction = "?"
-            confidences = []
-            output = ""
+            # --- LOOP THROUGH EACH DIGIT ---
+            for i, pixels in enumerate(pixel_batches):
 
-            try:
-                # 1. Connect to the Java Server
-                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                    s.connect((host, port))
-                    print(f"[DJANGO] Sending request to Java port {port}...")
-                    # 2. Send the pixels (with a newline at the end)
-                    s.sendall((input_string + "\n").encode('utf-8'))
+                # 1. Format data for Java
+                input_string = ",".join(map(str, pixels))
 
-                    # 3. Receive the response (Read until server closes or done)
-                    with s.makefile('r') as f:
-                        output = f.read()
+                host = '127.0.0.1'
+                port = 9999
+                prediction = "?"
+                confidences = []
 
+                # 2. Talk to Java (Standard Socket Code)
+                try:
+                    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                        s.connect((host, port))
+                        s.sendall((input_string + "\n").encode('utf-8'))
+                        with s.makefile('r') as f:
+                            output = f.read()
 
-                    # 4. Parse the response
-                    for line in output.split('\n'):
-                        line = line.strip()
-                        if "CONFIDENCES:" in line:
-                            raw_nums = line.split(":")[1].split(",")
-                            confidences = [float(x) for x in raw_nums]
-                        if "PREDICTION_RESULT:" in line:
-                            prediction = line.split(":")[1].strip()
+                        for line in output.split('\n'):
+                            line = line.strip()
+                            if "CONFIDENCES:" in line:
+                                raw_nums = line.split(":")[1].split(",")
+                                confidences = [float(x) for x in raw_nums]
+                            if "PREDICTION_RESULT:" in line:
+                                prediction = line.split(":")[1].strip()
 
+                except ConnectionRefusedError:
+                    return JsonResponse({'error': 'Java Brain Offline'}, status=500)
 
-                print(f"[DJANGO] Java responded: {prediction}")
-            except ConnectionRefusedError:
-                return JsonResponse({'error': 'Java Server is offline. Please run "java Server" in a terminal.'},
-                                    status=500)
+                # 3. Aggregate Results
+                if prediction.isdigit():
+                    full_prediction_string += prediction
 
+                    # Save Log
+                    log_entry = PredictionLog.objects.create(
+                        pixel_data=json.dumps(pixels),
+                        predicted_digit=int(prediction)
+                    )
+                    log_ids.append(log_entry.id)
 
-            # --- GRAPH GENERATION ---
-            graph_url = None
-            if confidences:
-                # 1. Setup the plot
-                plt.figure(figsize=(6, 3))  # Width, Height
-                plt.bar(range(10), confidences, color='#2563eb')  # Blue bars
+                # 4. Generate Graph (Only for the first digit found)
+                if i == 0 and confidences:
+                    plt.figure(figsize=(6, 3))
+                    plt.bar(range(10), confidences, color='#2563eb')
+                    plt.title('Confidence (First Digit)', fontsize=10)
+                    plt.xlabel('Digit', fontsize=8)
+                    plt.ylim(0, 1.0)
+                    plt.xticks(range(10))
+                    plt.grid(axis='y', linestyle='--', alpha=0.1)
 
-                # 2. Styling
-                plt.title('Neural Network Confidence', fontsize=10)
-                plt.xlabel('Digit (0-9)', fontsize=8)
-                plt.ylabel('Probability', fontsize=8)
-                plt.xticks(range(10))  # Show numbers 0-9 on x-axis
-                plt.ylim(0, 1.0)  # Scale from 0% to 100%
-                plt.grid(axis='y', linestyle='--', alpha=0.1)
+                    buffer = io.BytesIO()
+                    plt.savefig(buffer, format='png', bbox_inches='tight')
+                    buffer.seek(0)
+                    image_png = buffer.getvalue()
+                    buffer.close()
+                    plt.close()
 
-                # 3. Save to a memory buffer (not a file)
-                buffer = io.BytesIO()
-                plt.savefig(buffer, format='png', bbox_inches='tight')
-                buffer.seek(0)
+                    graphic = base64.b64encode(image_png).decode('utf-8')
+                    first_graph_url = f"data:image/png;base64,{graphic}"
 
-                # 4. Convert to Base64 String
-                image_png = buffer.getvalue()
-                buffer.close()
-                plt.close()  # Free memory
-
-                graphic = base64.b64encode(image_png).decode('utf-8')
-                graph_url = f"data:image/png;base64,{graphic}"
-
-            '''
-            # --- DEBUGGING: PRINT WHAT JAVA SAID ---
-            print("-" * 20)
-            print("JAVA STDOUT:", process.stdout)
-            print("JAVA STDERR:", process.stderr)
-            print("-" * 20)
-            '''
-
-
-
-            for line in output.split('\n'):
-                if "PREDICTION_RESULT:" in line:
-                    prediction = line.split(":")[1].strip()
-
-            # If prediction is still ?, send the raw error back to UI to see
-            if prediction == "?":
-                prediction = "Err"
-
-            total_count = PredictionLog.objects.count()
-
-
-            # 2. Save the Individual Log (NEW CODE)
-            # 'prediction' is the string (e.g. "7") we got from Java
-            log_id = None
-            if prediction.isdigit():
-                # Save the pixels AND the prediction
-                log_entry = PredictionLog.objects.create(
-                    pixel_data=json.dumps(pixel_data),  # Save input as string
-                    predicted_digit=int(prediction)
-                )
-                log_id = log_entry.id
-
+            # --- RETURN FINAL RESPONSE ---
             return JsonResponse({
-                'digit': prediction,
-                'log_id': log_id,
-                'global_count': total_count,
-                'graph_image': graph_url,
-                'raw_output': output
+                'digit': full_prediction_string,  # e.g., "12"
+                'log_id': log_ids[-1] if log_ids else None,  # Return last ID for feedback
+                'global_count': PredictionLog.objects.count(),
+                'graph_image': first_graph_url
             })
+
         except Exception as e:
             print("PYTHON ERROR:", e)
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
 
 
 @csrf_exempt
